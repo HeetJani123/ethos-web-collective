@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,20 @@ import {
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { AuthDialog } from '@/components/AuthDialog';
 
 const BlogPost = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const { user, profile } = useAuth();
   const [newComment, setNewComment] = useState('');
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(45);
+  const [comments, setComments] = useState<any[]>([]);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Mock post data (in a real app, this would come from an API)
   const post = {
@@ -57,30 +64,35 @@ const BlogPost = () => {
     tags: ["digital democracy", "civic engagement", "governance", "technology policy"]
   };
 
-  // Mock comments data
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "Prof. Michael Thompson",
-      content: "Excellent analysis, Dr. Chen. The point about digital divides is particularly important. Have you considered how blockchain technologies might address some of the trust and transparency challenges you mention?",
-      date: "2024-01-16",
-      likes: 12
-    },
-    {
-      id: 2,
-      author: "Dr. Lisa Park",
-      content: "This research is timely and relevant. I'd be interested in seeing a follow-up study that examines the long-term sustainability of these digital democracy initiatives.",
-      date: "2024-01-17",
-      likes: 8
-    },
-    {
-      id: 3,
-      author: "James Rodriguez",
-      content: "The comparison between Taiwan's vTaiwan and Estonia's e-residency program is fascinating. Do you think cultural factors play a significant role in the success of these platforms?",
-      date: "2024-01-18",
-      likes: 5
+  // Load comments from database
+  useEffect(() => {
+    loadComments();
+  }, [id]);
+
+  const loadComments = async () => {
+    if (!id) return;
+    
+    try {
+      const { data: commentsData, error } = await supabase
+        .from('comments')
+        .select(`
+          id,
+          content,
+          created_at,
+          profiles!inner(display_name)
+        `)
+        .eq('article_id', id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      setComments(commentsData || []);
+    } catch (error) {
+      console.error('Error loading comments:', error);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   const handleLike = () => {
     setLiked(!liked);
@@ -90,19 +102,35 @@ const BlogPost = () => {
     });
   };
 
-  const handleComment = () => {
-    if (newComment.trim()) {
-      const comment = {
-        id: comments.length + 1,
-        author: "You",
-        content: newComment,
-        date: new Date().toISOString().split('T')[0],
-        likes: 0
-      };
-      setComments([...comments, comment]);
+  const handleComment = async () => {
+    if (!user) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
+    if (!newComment.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          article_id: id,
+          author_id: user.id,
+          content: newComment.trim()
+        });
+
+      if (error) throw error;
+
       setNewComment('');
+      loadComments(); // Reload comments
       toast({
         description: "Comment posted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
       });
     }
   };
@@ -194,15 +222,16 @@ const BlogPost = () => {
               <Card>
                 <CardContent className="p-6 space-y-4">
                   <Textarea
-                    placeholder="Share your thoughts on this research..."
+                    placeholder={user ? "Share your thoughts on this research..." : "Sign in to comment on this article..."}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     className="min-h-[100px]"
+                    disabled={!user}
                   />
                   <div className="flex justify-end">
                     <Button onClick={handleComment} disabled={!newComment.trim()}>
                       <MessageCircle className="h-4 w-4 mr-2" />
-                      Post Comment
+                      {user ? "Post Comment" : "Sign in to Comment"}
                     </Button>
                   </div>
                 </CardContent>
@@ -211,43 +240,46 @@ const BlogPost = () => {
 
             {/* Comments List */}
             <div className="space-y-6">
-              {comments.map((comment) => (
-                <Card key={comment.id}>
-                  <CardContent className="p-6">
-                    <div className="flex space-x-4">
-                      <Avatar>
-                        <AvatarFallback>
-                          {comment.author.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium">{comment.author}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(comment.date).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {comment.content}
-                        </p>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="ghost" size="sm">
-                            <ThumbsUp className="h-4 w-4 mr-1" />
-                            {comment.likes}
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            Reply
-                          </Button>
+              {loading ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading comments...
+                </div>
+              ) : comments.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No comments yet. Be the first to share your thoughts!
+                </div>
+              ) : (
+                comments.map((comment) => (
+                  <Card key={comment.id}>
+                    <CardContent className="p-6">
+                      <div className="flex space-x-4">
+                        <Avatar>
+                          <AvatarFallback>
+                            {comment.profiles?.display_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium">{comment.profiles?.display_name || 'Anonymous'}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(comment.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {comment.content}
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </section>
         </div>
       </main>
+      
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 };
