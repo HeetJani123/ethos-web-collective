@@ -9,6 +9,7 @@ import Teams from "./pages/Teams";
 import Journal from "./pages/Journal";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
+import Test3D from "./pages/Test3D";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/teams" element={<Teams />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/journal/:id" element={<BlogPost />} />
+            <Route path="/test3d" element={<Test3D />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
