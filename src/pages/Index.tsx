@@ -1,126 +1,207 @@
 import Navigation from '@/components/Navigation';
 import { Link } from 'react-router-dom';
-import Tilt from 'react-parallax-tilt';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, Users, FileText, Globe, TrendingUp } from 'lucide-react';
+import { useParallax } from '@/hooks/useParallax';
+import { useMagneticButton } from '@/hooks/useMagneticButton';
 
 const stats = [
-  { label: 'Research Fellows', value: '150+' },
-  { label: 'Countries Represented', value: '25+' },
-  { label: 'Publications', value: '500+' },
-  { label: 'Research Teams', value: '12' },
+  { label: 'Research Fellows', value: '150+', icon: Users },
+  { label: 'Countries Represented', value: '25+', icon: Globe },
+  { label: 'Publications', value: '500+', icon: FileText },
+  { label: 'Research Teams', value: '12', icon: TrendingUp },
 ];
 
-const articles = [
+const features = [
   {
-    title: 'Explore our latest research insights',
-    excerpt: 'Discover our most recent research, policy analyses, and scholarly contributions to global challenges.',
+    title: 'Explore Our Latest Research',
+    description: 'Discover cutting-edge research, policy analyses, and scholarly contributions addressing global challenges.',
     link: '/journal',
+    icon: FileText,
   },
   {
-    title: 'Meet our research teams',
-    excerpt: 'Learn more about our interdisciplinary teams tackling complex issues worldwide.',
+    title: 'Meet Our Research Teams',
+    description: 'Learn about our interdisciplinary teams and their innovative approaches to complex problems.',
     link: '/teams',
+    icon: Users,
   },
 ];
 
-const heroImageUrl =
-  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80'; // Vibrant, high-contrast research image
+const heroImageUrl = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1920&q=80';
+
+const HeroButton = ({ children, variant = "default", ...props }: any) => {
+  const magneticRef = useMagneticButton(0.2);
+  
+  return (
+    <Button 
+      ref={magneticRef}
+      className="magnetic-btn"
+      variant={variant}
+      size="lg"
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+};
 
 const Index = () => {
+  const parallaxRef = useParallax(-0.3);
+  const slowParallaxRef = useParallax(-0.1);
+
   return (
-    <div style={{ background: 'var(--color-bg)', minHeight: '100vh' }}>
+    <div className="min-h-screen bg-background">
       <Navigation />
-      {/* Hero + Stats Background (curved top, ends above Get Started) */}
-      <div style={{ position: 'relative', width: '100vw', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw', height: 500, overflow: 'visible', zIndex: 0, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-        <Tilt
-          glareEnable={true}
-          glareMaxOpacity={0.15}
-          tiltMaxAngleX={10}
-          tiltMaxAngleY={10}
+      
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center hero-bg parallax-container overflow-hidden">
+        {/* Parallax Background Image */}
+        <div 
+          ref={parallaxRef}
+          className="absolute inset-0 parallax-element"
           style={{
-            width: '90vw',
-            maxWidth: 1100,
-            height: 500,
-            zIndex: 0,
-            overflow: 'visible',
-            cursor: 'pointer',
-            borderTopLeftRadius: '120px 80px',
-            borderTopRightRadius: '120px 80px',
-            borderBottomLeftRadius: '0',
-            borderBottomRightRadius: '0',
-            boxShadow: '0 8px 32px rgba(37,99,235,0.10)',
-            background: '#fff',
-            position: 'relative',
-            marginTop: '40px',
-            display: 'flex',
-            alignItems: 'flex-end',
+            backgroundImage: `url(${heroImageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+            filter: 'brightness(0.7) blur(0.5px)',
           }}
-        >
-          <img
-            src={heroImageUrl}
-            alt="Research and studying"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              filter: 'blur(0.5px) brightness(1)',
-              opacity: 1,
-              transition: 'filter 0.3s',
-              borderTopLeftRadius: '120px 80px',
-              borderTopRightRadius: '120px 80px',
-              borderBottomLeftRadius: '0',
-              borderBottomRightRadius: '0',
-            }}
-          />
-          {/* Main Content Above Image (Hero + Stats only) */}
-          <div style={{ position: 'absolute', zIndex: 3, maxWidth: 960, margin: '0 auto', left: 0, right: 0, top: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 2rem' }}>
-            {/* Hero Section */}
-            <section style={{ textAlign: 'center', padding: '3rem 0 2rem 0', color: '#fff', textShadow: '0 2px 12px rgba(0,0,0,0.7)' }}>
-              <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#fff', textShadow: '0 2px 12px rgba(0,0,0,0.7)' }}>
-                Advancing Knowledge Through Collaborative Research
-              </h1>
-              <p style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '2.5rem', textShadow: '0 2px 12px rgba(0,0,0,0.7)' }}>
-                We are a leading research institution dedicated to addressing the world's most pressing challenges through innovative interdisciplinary collaboration and evidence-based solutions.
-              </p>
-            </section>
-            {/* Stats Section */}
-            <section style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
-              {stats.map((stat) => (
-                <div key={stat.label} style={{ textAlign: 'center', minWidth: 120, color: '#fff', fontWeight: 700, textShadow: '0 2px 12px rgba(0,0,0,0.7)' }}>
-                  <div style={{ fontSize: '2rem', fontWeight: 700 }}>{stat.value}</div>
-                  <div style={{ fontSize: '1rem' }}>{stat.label}</div>
-                </div>
-              ))}
-            </section>
-          </div>
-        </Tilt>
-      </div>
-      {/* Get Started Section (no image behind) */}
-      <main className="container" style={{ maxWidth: 960, margin: '48px auto 0 auto', position: 'relative', zIndex: 1 }}>
-        <section>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--color-primary)' }}>Get Started</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {articles.map((article) => (
-              <div className="card" key={article.title}>
-                <h3 style={{ margin: 0, color: 'var(--color-primary)' }}>{article.title}</h3>
-                <p style={{ color: 'var(--color-muted)' }}>{article.excerpt}</p>
-                <Link to={article.link} style={{ color: 'var(--color-accent)', fontWeight: 600 }}>
-                  Learn more &rarr;
+        />
+        
+        {/* Animated overlay */}
+        <div 
+          ref={slowParallaxRef}
+          className="absolute inset-0 parallax-element bg-gradient-to-br from-primary/20 via-transparent to-purple-600/20"
+        />
+        
+        {/* Content */}
+        <div className="relative z-10 container text-center text-white">
+          <div className="space-y-8 animate-fade-in">
+            <h1 className="text-6xl md:text-7xl font-bold leading-tight">
+              Advancing Knowledge Through
+              <span className="block bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Collaborative Research
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed opacity-90">
+              We are a leading research institution dedicated to addressing the world's most 
+              pressing challenges through innovative interdisciplinary collaboration and 
+              evidence-based solutions.
+            </p>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
+              <HeroButton asChild>
+                <Link to="/teams">
+                  Explore Our Research
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
-              </div>
-            ))}
+              </HeroButton>
+              <HeroButton variant="outline" asChild>
+                <Link to="/journal">
+                  View Publications
+                </Link>
+              </HeroButton>
+            </div>
           </div>
-        </section>
-      </main>
-      <footer>
-        <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <div style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
-            Institute for Global Research
+        </div>
+
+        {/* Floating particles effect */}
+        <div className="absolute inset-0 pointer-events-none">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 1.5}s`,
+                animationDuration: `${6 + i}s`,
+              }}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-muted/50">
+        <div className="container">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div 
+                  key={stat.label} 
+                  className="text-center space-y-4 animate-slide-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Icon className="w-8 h-8 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-4xl font-bold text-foreground">{stat.value}</div>
+                    <div className="text-muted-foreground font-medium">{stat.label}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div style={{ fontSize: '1rem', color: 'var(--color-muted)', margin: '0.5rem 0' }}>
-            Advancing knowledge through collaborative research and evidence-based solutions.
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20">
+        <div className="container">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Get Started</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Explore our research initiatives and discover how we're making a difference
+            </p>
           </div>
-          <div style={{ fontSize: '0.9rem', color: 'var(--color-muted)' }}>
-            © 2024 Institute for Global Research. All rights reserved.
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div 
+                  key={feature.title}
+                  className="modern-card group"
+                  style={{ animationDelay: `${index * 0.2}s` }}
+                >
+                  <div className="space-y-6">
+                    <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <Icon className="w-8 h-8 text-primary" />
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-2xl font-semibold">{feature.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                      <Link 
+                        to={feature.link}
+                        className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors group"
+                      >
+                        Learn more 
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-muted/30 border-t">
+        <div className="container py-12">
+          <div className="text-center space-y-4">
+            <h3 className="text-2xl font-bold text-foreground">Institute for Global Research</h3>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Advancing knowledge through collaborative research and evidence-based solutions for a better world.
+            </p>
+            <div className="text-sm text-muted-foreground">
+              © 2024 Institute for Global Research. All rights reserved.
+            </div>
           </div>
         </div>
       </footer>
