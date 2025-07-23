@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 // @ts-ignore
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import type { Mesh } from 'three';
 
 function SpinningCube() {
@@ -23,16 +23,45 @@ function SpinningCube() {
 }
 
 const Hero = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = document.body.getBoundingClientRect();
+      setMousePosition({
+        x: (e.clientX - rect.width / 2) / rect.width,
+        y: (e.clientY - rect.height / 2) / rect.height,
+      });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
     <section className="relative py-20 lg:py-32 overflow-hidden">
-      {/* 3D Background Canvas */}
-      <div className="absolute inset-0 -z-10 pointer-events-none">
+      {/* Interactive Background with Cursor Stretch Effect */}
+      <div 
+        className="absolute inset-0 -z-10 transition-transform duration-300 ease-out"
+        style={{
+          transform: `perspective(1000px) rotateX(${mousePosition.y * 2}deg) rotateY(${mousePosition.x * 2}deg) scale(1.02)`,
+          background: 'radial-gradient(circle at center, hsl(var(--primary)/0.1), hsl(var(--background)))',
+        }}
+      >
         <Canvas camera={{ position: [0, 0, 4], fov: 50 }} style={{ width: '100%', height: '100%' }}>
           <ambientLight intensity={0.9} />
           <directionalLight position={[2, 2, 5]} intensity={1} />
           <SpinningCube />
         </Canvas>
       </div>
+      
+      {/* Cursor-responsive overlay */}
+      <div 
+        className="absolute inset-0 -z-5 pointer-events-none transition-all duration-500"
+        style={{
+          background: `radial-gradient(600px circle at ${50 + mousePosition.x * 30}% ${50 + mousePosition.y * 30}%, hsl(var(--primary)/0.15), transparent 50%)`,
+        }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-8">
           <div className="space-y-4">
