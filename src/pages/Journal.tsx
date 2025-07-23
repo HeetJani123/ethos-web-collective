@@ -1,152 +1,151 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Calendar, User, Heart, MessageCircle } from 'lucide-react';
-import Navigation from '@/components/Navigation';
+import { Search } from 'lucide-react';
+
+const categories = [
+  'All',
+  'Democratic Governance',
+  'Climate Policy',
+  'Technology & Society',
+  'Social Innovation',
+  'Economic Policy',
+];
+
+const journals = [
+  {
+    title: 'The Future of Digital Democracy',
+    excerpt: 'Exploring innovations in civic participation and governance.',
+    category: 'Democratic Governance',
+    content: 'Full article content for The Future of Digital Democracy...'
+  },
+  {
+    title: 'Carbon Pricing in Developing Economies',
+    excerpt: 'A comparative study of market mechanisms and social impact.',
+    category: 'Climate Policy',
+    content: 'Full article content for Carbon Pricing in Developing Economies...'
+  },
+  {
+    title: 'AI Ethics in Healthcare',
+    excerpt: 'Balancing innovation and patient rights in a digital age.',
+    category: 'Technology & Society',
+    content: 'Full article content for AI Ethics in Healthcare...'
+  },
+  {
+    title: 'Universal Basic Income: Global Pilots',
+    excerpt: 'Meta-analysis of UBI programs and their outcomes.',
+    category: 'Social Innovation',
+    content: 'Full article content for Universal Basic Income...'
+  },
+  {
+    title: 'Post-Pandemic Economic Recovery',
+    excerpt: 'Fiscal and monetary policy responses to COVID-19.',
+    category: 'Economic Policy',
+    content: 'Full article content for Post-Pandemic Economic Recovery...'
+  },
+  {
+    title: 'Youth Policy Innovations',
+    excerpt: 'New approaches to youth engagement and empowerment.',
+    category: 'Social Innovation',
+    content: 'Full article content for Youth Policy Innovations...'
+  },
+];
+
+const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
 
 const Journal = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  
-  // No journal posts yet; placeholder for future real posts
-  const posts = [];
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [modal, setModal] = useState<{title: string, content: string} | null>(null);
 
-  const categories = ["All", "Democratic Governance", "Climate Policy", "Technology & Society", "Social Innovation", "Economic Policy"];
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = document.body.getBoundingClientRect();
-      setMousePosition({
-        x: (e.clientX / rect.width) * 100,
-        y: (e.clientY / rect.height) * 100,
-      });
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    return () => document.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
+  const filteredJournals = journals.filter(journal => {
+    const matchesSearch =
+      journal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      journal.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || journal.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const featuredPosts = posts.filter(post => post.featured);
-
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div
+      className="min-h-screen bg-background relative"
+      style={{
+        background: `url(${bgImage}) center/cover no-repeat fixed, linear-gradient(135deg, #e0e7ef 0%, #f8fafc 100%)`,
+      }}
+    >
       <Navigation />
-      
-      {/* Glassmorphism Background with Cursor Effects */}
-      <div 
-        className="fixed inset-0 -z-10"
-        style={{
-          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, hsl(var(--primary)/0.08), transparent 50%), linear-gradient(135deg, hsl(var(--background)), hsl(var(--muted)/0.3))`,
-        }}
-      />
-      
-      <main className="py-16 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center space-y-4 mb-16">
-            <h1>Research Journal</h1>
-            <p className="lead mx-auto max-w-3xl">
-              Explore our latest research insights, policy analyses, and scholarly contributions 
-              to understanding the world's most pressing challenges.
+      <main className={`py-20 bg-background/80 min-h-screen transition-all duration-300 ${modal ? 'blur-md pointer-events-none select-none' : ''}`}> 
+        <div className="container">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">Research Journal</h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Explore our latest research insights, policy analyses, and scholarly contributions.
             </p>
           </div>
-
-          {/* Search and Filters with Glassmorphism */}
-          <div className="mb-12 space-y-6">
-            <div 
-              className="relative max-w-md mx-auto p-6 rounded-2xl transition-all duration-300"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <Search className="absolute left-9 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          {/* Search and Categories */}
+          <div className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="relative max-w-md w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search articles..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-transparent border-white/20 focus:border-white/40"
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-10"
               />
             </div>
-            
-            <div 
-              className="flex flex-wrap justify-center gap-2 p-4 rounded-xl transition-all duration-300"
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-              }}
-            >
-              {categories.map((category) => (
+            <div className="flex flex-wrap gap-2 justify-center md:justify-end">
+              {categories.map(category => (
                 <Button
                   key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
+                  variant={selectedCategory === category ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
-                  className="transition-all duration-200 hover:scale-105"
                 >
                   {category}
                 </Button>
               ))}
             </div>
           </div>
-
-          {/* Featured Articles with Glassmorphism */}
-          {selectedCategory === "All" && searchTerm === "" && (
-            <div className="mb-16">
-              <h2 className="text-2xl font-serif font-semibold mb-8">Featured Articles</h2>
-              <div className="grid md:grid-cols-2 gap-8">
-                {/* No featured posts yet */}
-                <div 
-                  className="col-span-2 text-center text-muted-foreground py-12 rounded-2xl transition-all duration-300"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.05)',
-                  }}
-                >
-                  No featured articles yet. Check back soon!
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* All Articles with Glassmorphism */}
-          <div>
-            <h2 className="text-2xl font-serif font-semibold mb-8">
-              {selectedCategory === "All" ? "Latest Articles" : `${selectedCategory} Articles`}
-            </h2>
-            <div className="space-y-6">
-              {/* No articles yet */}
-              <div 
-                className="text-center text-muted-foreground py-12 rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+          {/* Journal Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredJournals.map((journal, i) => (
+              <div
+                key={i}
+                className="backdrop-blur-lg bg-white/20 border border-white/30 rounded-2xl shadow-xl p-8 flex flex-col gap-4 cursor-pointer hover:scale-[1.03] transition-transform glass-card"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.05)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  background: 'rgba(255,255,255,0.18)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
                 }}
+                onClick={() => setModal({ title: journal.title, content: journal.content })}
               >
-                No journal articles have been published yet. Stay tuned!
+                <h3 className="text-2xl font-semibold text-foreground mb-2">{journal.title}</h3>
+                <p className="text-muted-foreground mb-4">{journal.excerpt}</p>
+                <div className="flex-1" />
+                <Button className="mt-4 w-fit" variant="outline">Read More</Button>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </main>
+      {/* Modal Popup */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative animate-fade-in">
+            <button
+              className="absolute top-4 right-4 text-xl text-muted-foreground hover:text-primary"
+              onClick={() => setModal(null)}
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-4">{modal.title}</h2>
+            <p className="text-muted-foreground mb-2">{modal.content}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

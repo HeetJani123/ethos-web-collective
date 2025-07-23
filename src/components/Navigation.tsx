@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,8 +15,17 @@ import {
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -28,7 +37,13 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-50">
+      <nav
+        className={`border-b border-border sticky top-0 z-50 backdrop-blur transition-all duration-300 ${
+          scrolled
+            ? 'bg-background/60 shadow-lg' // transparent with shadow
+            : 'bg-background/95'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -53,7 +68,6 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
-              
               {/* Auth Section */}
               {user ? (
                 <DropdownMenu>
@@ -117,7 +131,6 @@ const Navigation = () => {
                     {item.name}
                   </Link>
                 ))}
-                
                 {/* Mobile Auth */}
                 <div className="pt-4 border-t border-border">
                   {user ? (
@@ -162,7 +175,6 @@ const Navigation = () => {
           )}
         </div>
       </nav>
-      
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );
