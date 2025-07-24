@@ -26,42 +26,64 @@ const BlogPost = () => {
   const { user, profile } = useAuth();
   const [newComment, setNewComment] = useState('');
   const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(45);
+  const [likes, setLikes] = useState(0);
   const [comments, setComments] = useState<any[]>([]);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [article, setArticle] = useState<any>(null);
 
-  // Mock post data (in a real app, this would come from an API)
-  const post = {
-    id: 1,
-    title: "The Future of Digital Democracy: Lessons from Global Experiments",
-    content: `
-      <p>The intersection of technology and democratic governance has become one of the most fascinating areas of political research in the 21st century. As digital tools reshape how citizens engage with government, we find ourselves at a critical juncture in the evolution of democratic institutions.</p>
+  // Load article and check if user has liked it
+  useEffect(() => {
+    if (id) {
+      loadArticle();
+      checkUserLike();
+    }
+  }, [id, user]);
 
-      <h3>Global Digital Democracy Initiatives</h3>
-      <p>Our comprehensive study examined digital democratic innovations across five continents, from Estonia's e-residency program to Taiwan's vTaiwan platform. These experiments offer valuable insights into how technology can enhance civic participation while maintaining the integrity of democratic processes.</p>
+  const loadArticle = async () => {
+    if (!id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select(`
+          *,
+          profiles:author_id (display_name)
+        `)
+        .eq('id', id)
+        .single();
 
-      <h3>Key Findings</h3>
-      <p>Three primary patterns emerged from our analysis:</p>
-      <ul>
-        <li><strong>Increased Participation:</strong> Digital platforms consistently showed higher engagement rates among younger demographics, with participation increasing by an average of 23% in studied cases.</li>
-        <li><strong>Enhanced Transparency:</strong> Real-time access to government data and decision-making processes improved public trust in institutions by measurable margins.</li>
-        <li><strong>Deliberative Quality:</strong> Well-designed digital platforms fostered more substantive policy discussions compared to traditional public forums.</li>
-      </ul>
+      if (error) throw error;
+      
+      setArticle(data);
+      setLikes(data.likes_count || 0);
+    } catch (error) {
+      console.error('Error loading article:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load article",
+        variant: "destructive",
+      });
+    }
+  };
 
-      <h3>Challenges and Considerations</h3>
-      <p>However, our research also revealed significant challenges. Digital divides can exacerbate existing inequalities in political participation. Cybersecurity concerns and the potential for manipulation require robust safeguards. Most critically, the design of digital democratic tools must be guided by democratic principles, not technological possibilities alone.</p>
+  const checkUserLike = async () => {
+    if (!user || !id) return;
 
-      <h3>Recommendations for Implementation</h3>
-      <p>Based on our findings, we recommend a gradual, evidence-based approach to digital democracy implementation. This includes investing in digital literacy programs, establishing clear privacy and security standards, and maintaining multiple channels for civic participation to ensure inclusivity.</p>
+    try {
+      const { data, error } = await supabase
+        .from('article_likes')
+        .select('id')
+        .eq('article_id', id)
+        .eq('user_id', user.id)
+        .single();
 
-      <p>The future of digital democracy lies not in replacing traditional democratic institutions, but in thoughtfully augmenting them with technology that serves democratic values and expands meaningful participation for all citizens.</p>
-    `,
-    author: "Dr. Sarah Chen",
-    date: "2024-01-15",
-    category: "Democratic Governance",
-    readTime: "8 min read",
-    tags: ["digital democracy", "civic engagement", "governance", "technology policy"]
+      if (data) {
+        setLiked(true);
+      }
+    } catch (error) {
+      // User hasn't liked the article yet
+    }
   };
 
   // Load comments from database
@@ -94,12 +116,60 @@ const BlogPost = () => {
     }
   };
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikes(prev => liked ? prev - 1 : prev + 1);
-    toast({
-      description: liked ? "Removed from favorites" : "Added to favorites",
-    });
+  const handleLike = async () => {
+    if (!user) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
+    try {
+      if (liked) {
+        // Remove like
+        await supabase
+          .from('article_likes')
+          .delete()
+          .eq('article_id', id)
+          .eq('user_id', user.id);
+        
+        // Update likes count
+        await supabase
+          .from('articles')
+          .update({ likes_count: likes - 1 })
+          .eq('id', id);
+        
+        setLiked(false);
+        setLikes(prev => prev - 1);
+        toast({
+          description: "Removed from favorites",
+        });
+      } else {
+        // Add like
+        await supabase
+          .from('article_likes')
+          .insert({
+            article_id: id,
+            user_id: user.id
+          });
+        
+        // Update likes count
+        await supabase
+          .from('articles')
+          .update({ likes_count: likes + 1 })
+          .eq('id', id);
+        
+        setLiked(true);
+        setLikes(prev => prev + 1);
+        toast({
+          description: "Added to favorites",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleComment = async () => {
@@ -156,26 +226,30 @@ const BlogPost = () => {
             </Link>
           </div>
 
-          {/* Article Header */}
-          <article className="space-y-8">
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <Badge variant="secondary">{post.category}</Badge>
-                <h1 className="text-4xl md:text-5xl font-serif font-semibold leading-tight">
-                  {post.title}
-                </h1>
-                <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-                  <div className="flex items-center space-x-1">
-                    <User className="h-4 w-4" />
-                    <span>{post.author}</span>
+          {/* Loading State */}
+          {!article ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-muted-foreground">Loading article...</p>
+            </div>
+          ) : (
+            /* Article Header */
+            <article className="space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h1 className="text-4xl md:text-5xl font-serif font-semibold leading-tight">
+                    {article.title}
+                  </h1>
+                  <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                    <div className="flex items-center space-x-1">
+                      <User className="h-4 w-4" />
+                      <span>{article.profiles?.display_name || 'Anonymous'}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(article.published_at).toLocaleDateString()}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{new Date(post.date).toLocaleDateString()}</span>
-                  </div>
-                  <span>{post.readTime}</span>
                 </div>
-              </div>
 
               {/* Article Actions */}
               <div className="flex items-center space-x-4 py-4 border-y border-border">
@@ -196,20 +270,11 @@ const BlogPost = () => {
             </div>
 
             {/* Article Content */}
-            <div 
-              className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-ul:text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 pt-8 border-t border-border">
-              {post.tags.map((tag, index) => (
-                <Badge key={index} variant="outline">
-                  {tag}
-                </Badge>
-              ))}
+            <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-ul:text-muted-foreground">
+              <div dangerouslySetInnerHTML={{ __html: article.content || '<p>Article content loading...</p>' }} />
             </div>
           </article>
+          )}
 
           {/* Comments Section */}
           <section className="mt-16 space-y-8">
