@@ -75,32 +75,37 @@ const Journal = () => {
       }}
     >
       <Navigation />
-      <main className={`py-20 bg-background/80 min-h-screen transition-all duration-300 ${modal ? 'blur-md pointer-events-none select-none' : ''}`}> 
-        <div className="container">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Research Journal</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+      <main className={`pt-24 pb-20 bg-background/80 min-h-screen transition-all duration-300 ${modal ? 'blur-md pointer-events-none select-none' : ''}`}> 
+        <div className="container max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Research Journal</h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Explore our latest research insights, policy analyses, and scholarly contributions.
             </p>
           </div>
+          
           {/* Search and Categories */}
-          <div className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="relative max-w-md w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search articles..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          <div className="mb-16 space-y-8">
+            <div className="flex justify-center">
+              <div className="relative max-w-xl w-full">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search articles..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="pl-12 pr-4 py-3 text-lg border-2 rounded-xl bg-background/50 backdrop-blur-sm"
+                />
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2 justify-center md:justify-end">
+            
+            <div className="flex flex-wrap gap-3 justify-center max-w-4xl mx-auto">
               {categories.map(category => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? 'default' : 'outline'}
-                  size="sm"
+                  size="default"
                   onClick={() => setSelectedCategory(category)}
+                  className="px-6 py-2 rounded-full transition-all duration-300"
                 >
                   {category}
                 </Button>
@@ -112,7 +117,7 @@ const Journal = () => {
             {filteredJournals.map((journal, i) => (
               <div
                 key={i}
-                className="backdrop-blur-lg bg-white/20 border border-white/30 rounded-2xl shadow-xl p-8 flex flex-col gap-4 cursor-pointer hover:scale-[1.03] transition-transform glass-card"
+                className="group relative backdrop-blur-lg bg-white/20 border border-white/30 rounded-2xl shadow-xl p-8 flex flex-col gap-4 cursor-pointer hover:scale-[1.03] transition-all duration-500 glass-card overflow-hidden"
                 style={{
                   boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
                   border: '1px solid rgba(255,255,255,0.25)',
@@ -122,10 +127,20 @@ const Journal = () => {
                 }}
                 onClick={() => setModal({ title: journal.title, content: journal.content })}
               >
-                <h3 className="text-2xl font-semibold text-foreground mb-2">{journal.title}</h3>
-                <p className="text-muted-foreground mb-4">{journal.excerpt}</p>
-                <div className="flex-1" />
-                <Button className="mt-4 w-fit" variant="outline">Read More</Button>
+                {/* Content that blurs on hover */}
+                <div className="group-hover:blur-sm transition-all duration-300 relative z-10">
+                  <h3 className="text-2xl font-semibold text-foreground mb-2">{journal.title}</h3>
+                  <p className="text-muted-foreground mb-4">{journal.excerpt}</p>
+                  <div className="flex-1" />
+                  <Button className="mt-4 w-fit" variant="outline">Read More</Button>
+                </div>
+                
+                {/* Read Now overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                  <div className="text-3xl font-bold text-primary bg-background/90 px-8 py-4 rounded-xl shadow-2xl backdrop-blur-sm border border-primary/20">
+                    Read Now
+                  </div>
+                </div>
               </div>
             ))}
           </div>
