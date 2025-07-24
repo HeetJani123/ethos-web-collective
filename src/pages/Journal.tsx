@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 const categories = [
   'All',
@@ -57,46 +55,17 @@ const journals = [
 const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
 
 const Journal = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [articles, setArticles] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState<{title: string, content: string} | null>(null);
 
-  useEffect(() => {
-    fetchArticles();
-  }, []);
-
-  const fetchArticles = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('articles')
-        .select(`
-          *,
-          profiles:author_id (display_name)
-        `)
-        .order('published_at', { ascending: false });
-
-      if (error) throw error;
-      setArticles(data || []);
-    } catch (error) {
-      console.error('Error fetching articles:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredArticles = articles.filter(article => {
+  const filteredJournals = journals.filter(journal => {
     const matchesSearch =
-      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === 'All';
+      journal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      journal.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || journal.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
-  const handleArticleClick = (articleId: string) => {
-    navigate(`/journal/${articleId}`);
-  };
 
   return (
     <div
@@ -106,7 +75,7 @@ const Journal = () => {
       }}
     >
       <Navigation />
-      <main className="pt-24 pb-20 bg-background/80 min-h-screen transition-all duration-300"> 
+      <main className={`pt-24 pb-20 bg-background/80 min-h-screen transition-all duration-300 ${modal ? 'blur-md pointer-events-none select-none' : ''}`}> 
         <div className="container max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Research Journal</h1>
@@ -143,51 +112,53 @@ const Journal = () => {
               ))}
             </div>
           </div>
-          
-          {/* Loading State */}
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-muted-foreground">Loading articles...</p>
-            </div>
-          ) : (
-            /* Journal Cards */
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredArticles.map((article) => (
-                <div
-                  key={article.id}
-                  className="group relative backdrop-blur-lg bg-white/20 border border-white/30 rounded-2xl shadow-xl p-8 flex flex-col gap-4 cursor-pointer hover:scale-[1.03] transition-all duration-500 glass-card overflow-hidden"
-                  style={{
-                    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
-                    border: '1px solid rgba(255,255,255,0.25)',
-                    background: 'rgba(255,255,255,0.18)',
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                  }}
-                  onClick={() => handleArticleClick(article.id)}
-                >
-                  {/* Content that blurs on hover */}
-                  <div className="group-hover:blur-sm transition-all duration-300 relative z-10">
-                    <h3 className="text-2xl font-semibold text-foreground mb-4">{article.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">{article.excerpt}</p>
-                  </div>
-                  
-                  {/* Read More overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
-                    <div className="text-lg font-semibold text-primary bg-background/95 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-primary/30 transform scale-95 group-hover:scale-100 transition-transform duration-300">
-                      Read More
-                    </div>
+          {/* Journal Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredJournals.map((journal, i) => (
+              <div
+                key={i}
+                className="group relative backdrop-blur-lg bg-white/20 border border-white/30 rounded-2xl shadow-xl p-8 flex flex-col gap-4 cursor-pointer hover:scale-[1.03] transition-all duration-500 glass-card overflow-hidden"
+                style={{
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  background: 'rgba(255,255,255,0.18)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                }}
+                onClick={() => setModal({ title: journal.title, content: journal.content })}
+              >
+                {/* Content that blurs on hover */}
+                <div className="group-hover:blur-sm transition-all duration-300 relative z-10">
+                  <h3 className="text-2xl font-semibold text-foreground mb-4">{journal.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{journal.excerpt}</p>
+                </div>
+                
+                {/* Read More overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
+                  <div className="text-lg font-semibold text-primary bg-background/95 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-primary/30 transform scale-95 group-hover:scale-100 transition-transform duration-300">
+                    Read More
                   </div>
                 </div>
-              ))}
-              {filteredArticles.length === 0 && (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-lg text-muted-foreground">No articles found.</p>
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </div>
       </main>
+      {/* Modal Popup */}
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative animate-fade-in">
+            <button
+              className="absolute top-4 right-4 text-xl text-muted-foreground hover:text-primary"
+              onClick={() => setModal(null)}
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-4">{modal.title}</h2>
+            <p className="text-muted-foreground mb-2">{modal.content}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
