@@ -129,16 +129,14 @@ const Journal = () => {
               >
                 {/* Content that blurs on hover */}
                 <div className="group-hover:blur-sm transition-all duration-300 relative z-10">
-                  <h3 className="text-2xl font-semibold text-foreground mb-2">{journal.title}</h3>
-                  <p className="text-muted-foreground mb-4">{journal.excerpt}</p>
-                  <div className="flex-1" />
-                  <Button className="mt-4 w-fit" variant="outline">Read More</Button>
+                  <h3 className="text-2xl font-semibold text-foreground mb-4">{journal.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{journal.excerpt}</p>
                 </div>
                 
-                {/* Read Now overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                  <div className="text-3xl font-bold text-primary bg-background/90 px-8 py-4 rounded-xl shadow-2xl backdrop-blur-sm border border-primary/20">
-                    Read Now
+                {/* Read More overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
+                  <div className="text-lg font-semibold text-primary bg-background/95 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-primary/30 transform scale-95 group-hover:scale-100 transition-transform duration-300">
+                    Read More
                   </div>
                 </div>
               </div>
