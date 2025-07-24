@@ -1,15 +1,49 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
+import { Users, Globe, FileText, TrendingUp, Zap, Shield, Heart } from 'lucide-react';
+import Tilt from 'react-parallax-tilt';
+import { useRef, useEffect, useState } from 'react';
 
-const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
+const bgImage = '/bg-illustration.jpg';
+
+const teamIcons = [Users, Globe, FileText, TrendingUp, Zap, Shield, Heart];
+
+function useInView(threshold = 0.18) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const observer = new window.IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => { if (ref.current) observer.unobserve(ref.current); };
+  }, [threshold]);
+  return [ref, inView];
+}
+
+function useScrollParallax(count: number) {
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  // For each card, calculate a parallax offset based on scrollY and index
+  return Array.from({ length: count }, (_, i) => {
+    // Each card moves in opposite direction, and the effect is subtle
+    const direction = i % 2 === 0 ? 1 : -1;
+    return direction * Math.min(32, scrollY * 0.08 + i * 2); // max 32px offset
+  });
+}
 
 const Teams = () => {
   const teams = [
     {
-      name: "Economic Policy Research",
-      focus: "Macroeconomic analysis, fiscal policy, and international trade",
-      description: "Our economists examine the complex relationships between policy decisions and economic outcomes, providing evidence-based recommendations for sustainable growth and stability.",
+      name: "Artificial Intelligence",
+      focus: "Machine learning, deep learning, and intelligent systems",
+      description: "Our AI team pioneers research in machine learning, deep learning, and intelligent systems, developing innovative solutions for real-world challenges across industries.",
       projects: [
         "Global Trade Impact Assessment",
         "Digital Currency Policy Framework",
@@ -19,9 +53,9 @@ const Teams = () => {
       lead: "Dr. Sarah Chen"
     },
     {
-      name: "Climate & Environmental Studies",
-      focus: "Climate change mitigation, environmental policy, and sustainability",
-      description: "This interdisciplinary team combines environmental science, economics, and policy analysis to address the urgent challenges of climate change and environmental degradation.",
+      name: "Bio Technology",
+      focus: "Genetic engineering, synthetic biology, and bioprocessing",
+      description: "The Bio Technology team explores advancements in genetic engineering, synthetic biology, and bioprocessing to drive breakthroughs in healthcare, agriculture, and sustainability.",
       projects: [
         "Carbon Pricing Mechanisms Study",
         "Urban Sustainability Index",
@@ -31,9 +65,9 @@ const Teams = () => {
       lead: "Prof. Michael Rodriguez"
     },
     {
-      name: "Social Innovation Lab",
-      focus: "Social policy, inequality, and community development",
-      description: "Researchers in this lab explore innovative approaches to social challenges, focusing on evidence-based interventions that promote equity and social cohesion.",
+      name: "Climate Technology",
+      focus: "Renewable energy, carbon capture, and climate modeling",
+      description: "Our Climate Technology group innovates in renewable energy, carbon capture, and climate modeling, working to combat climate change and promote environmental resilience.",
       projects: [
         "Universal Basic Income Pilot Analysis",
         "Digital Divide Assessment",
@@ -43,9 +77,9 @@ const Teams = () => {
       lead: "Dr. Amara Okafor"
     },
     {
-      name: "Technology & Society",
-      focus: "Digital governance, AI ethics, and technological impact",
-      description: "This team examines the intersection of technology and society, providing frameworks for responsible innovation and digital governance.",
+      name: "Med Society",
+      focus: "Medicine, public health, and healthcare innovation",
+      description: "Med Society unites experts in medicine, public health, and social sciences to address healthcare challenges, improve patient outcomes, and advance medical research.",
       projects: [
         "AI Governance Standards",
         "Platform Regulation Analysis",
@@ -55,9 +89,9 @@ const Teams = () => {
       lead: "Dr. James Kim"
     },
     {
-      name: "Global Health Initiative",
-      focus: "Health systems, pandemic preparedness, and health equity",
-      description: "Our health researchers work on strengthening health systems, improving pandemic preparedness, and addressing health inequalities worldwide.",
+      name: "Stem Ethics",
+      focus: "Ethics in science, technology, engineering, and mathematics",
+      description: "The Stem Ethics team examines the ethical, legal, and social implications of advances in science, technology, engineering, and mathematics, ensuring responsible innovation.",
       projects: [
         "Pandemic Preparedness Framework",
         "Healthcare Access Analysis",
@@ -66,61 +100,78 @@ const Teams = () => {
       members: 20,
       lead: "Dr. Elena Petrov"
     },
-    {
-      name: "Democratic Governance",
-      focus: "Political institutions, electoral systems, and civic engagement",
-      description: "This team studies democratic institutions and processes, working to strengthen governance systems and promote civic participation.",
-      projects: [
-        "Electoral System Reform Study",
-        "Civic Engagement Measurement",
-        "Digital Democracy Tools"
-      ],
-      members: 14,
-      lead: "Prof. David Thompson"
-    }
+    
   ];
+  const parallaxOffsets = useScrollParallax(teams.length);
 
   return (
     <div
       className="min-h-screen relative"
       style={{
-        background: `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url(${bgImage}) center/cover no-repeat fixed`,
+        background: `linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url(${bgImage}) center/cover no-repeat fixed`,
       }}
     >
       <Navigation />
-      
-      <main className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-4 mb-16">
-            <h1>Research Teams</h1>
-            <p className="lead mx-auto max-w-3xl">
-              Our diverse research teams bring together experts from various disciplines 
-              to tackle complex challenges and drive meaningful change through evidence-based research.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {teams.map((team, index) => (
-              <Card key={index} className="h-full">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <CardTitle className="text-xl">{team.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground font-medium">
-                        {team.focus}
-                      </p>
+      {/* Removed 3D Animated Background Shape */}
+      <main className="container px-4 md:px-0" style={{ maxWidth: 960, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <div className="text-center space-y-4 mb-16">
+          <h1 className="text-3xl md:text-5xl font-bold text-primary">Research Teams</h1>
+          <p className="lead mx-auto max-w-3xl text-muted-foreground">
+            Our diverse research teams bring together experts from various disciplines 
+            to tackle complex challenges and drive meaningful change through evidence-based research.
+          </p>
+        </div>
+        <div className="grid lg:grid-cols-2 gap-10">
+          {teams.map((team, index) => {
+            const Icon = teamIcons[index % teamIcons.length];
+            const [ref, inView] = useInView();
+            // Slide in from left for even, right for odd
+            const slideX = inView ? 0 : (index % 2 === 0 ? -64 : 64);
+            // Center the last card if odd number of teams
+            const isLast = index === teams.length - 1;
+            const isOdd = teams.length % 2 === 1;
+            const cardClass = isLast && isOdd ? 'col-span-2 justify-self-center' : '';
+            return (
+              <div ref={ref as React.Ref<any>} style={{ width: '100%' }} key={index} className={cardClass}>
+                <Tilt
+                  glareEnable={true}
+                  glareMaxOpacity={0.18}
+                  tiltMaxAngleX={0}
+                  tiltMaxAngleY={0}
+                  transitionSpeed={350}
+                  perspective={1200}
+                  scale={1.0}
+                  className={`team-fade-in${index} glass-card`}
+                  style={{
+                    background: 'rgba(255,255,255,0.85)',
+                    borderRadius: '1.25rem',
+                    boxShadow: '0 4px 24px 0 rgba(31,38,135,0.10)',
+                    border: '1.5px solid rgba(31,38,135,0.08)',
+                    padding: '2.2rem',
+                    transition: 'transform 0.9s cubic-bezier(.4,2,.6,1), box-shadow 0.7s, border-color 0.7s',
+                    animation: inView ? `fadeInSide 0.9s cubic-bezier(.4,2,.6,1) both` : 'none',
+                    transform: `translateX(${slideX}px) scale(1)`,
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    willChange: 'transform',
+                  }}
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center animate-bounce-slow">
+                      <Icon className="w-7 h-7 text-primary" />
                     </div>
-                    <Badge variant="secondary" className="ml-4">
+                    <Badge variant="secondary" className="ml-2 text-base px-3 py-1 animate-pulse">
                       {team.members} members
                     </Badge>
                   </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground leading-relaxed">
+                  <div className="space-y-2 mb-2">
+                    <h2 className="text-xl font-bold text-primary mb-1">{team.name}</h2>
+                    <p className="text-sm text-muted-foreground font-medium">{team.focus}</p>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
                     {team.description}
                   </p>
-                  
                   <div>
                     <h4 className="font-medium text-sm mb-2">Current Projects</h4>
                     <ul className="space-y-1">
@@ -132,19 +183,35 @@ const Teams = () => {
                       ))}
                     </ul>
                   </div>
-                  
-                  <div className="pt-2 border-t border-border">
+                  <div className="pt-2 border-t border-border mt-4">
                     <p className="text-sm">
                       <span className="text-muted-foreground">Team Lead:</span>{' '}
                       <span className="font-medium">{team.lead}</span>
                     </p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </Tilt>
+              </div>
+            );
+          })}
         </div>
       </main>
+      <style>{`
+        @keyframes fadeInSide {
+          0% { opacity: 0; transform: translateX(var(--slide-x, 0)) scale(1); }
+          100% { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .glass-card {
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 2.2s infinite alternate cubic-bezier(.4,2,.6,1);
+        }
+        @keyframes bounce-slow {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-10px); }
+        }
+      `}</style>
     </div>
   );
 };

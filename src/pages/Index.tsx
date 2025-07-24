@@ -2,7 +2,6 @@ import Navigation from '@/components/Navigation';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Users, FileText, Globe, TrendingUp } from 'lucide-react';
-import { useParallax } from '@/hooks/useParallax';
 import { useMagneticButton } from '@/hooks/useMagneticButton';
 
 const stats = [
@@ -27,96 +26,78 @@ const features = [
   },
 ];
 
-const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
-
-const HeroButton = ({ children, variant = "default", ...props }: any) => {
-  const magneticRef = useMagneticButton(0.2);
-  
-  return (
-    <Button 
-      ref={magneticRef}
-      className="magnetic-btn"
-      variant={variant}
-      size="lg"
-      {...props}
-    >
-      {children}
-    </Button>
-  );
-};
+const bgImage = '/bg-illustration.jpg';
 
 const Index = () => {
   return (
     <div
       className="min-h-screen relative"
       style={{
-        background: `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url(${bgImage}) center/cover no-repeat fixed`,
+        background: `linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url(${bgImage}) center/cover no-repeat fixed`,
       }}
     >
       <Navigation />
-      {/* Original content structure below (no glassmorphism on containers) */}
-      <main className="container" style={{ maxWidth: 960, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <main className="container px-4 md:px-0" style={{ maxWidth: 960, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Hero Section */}
-        <section style={{ textAlign: 'center', padding: '3rem 0 2rem 0' }}>
-          <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>
+        <section className="text-center pt-16 pb-8 md:pt-24 md:pb-12">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 text-primary">
             Advancing Knowledge Through Collaborative Research
           </h1>
-          <p style={{ fontSize: '1.25rem', color: 'var(--color-muted)', marginBottom: '2.5rem' }}>
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             We are a leading research institution dedicated to addressing the world's most pressing challenges through innovative interdisciplinary collaboration and evidence-based solutions.
           </p>
         </section>
         {/* Stats Section */}
-        <section style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <section className="flex flex-wrap justify-center gap-8 mb-12">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div 
                 key={stat.label} 
-                className="text-center space-y-4 animate-slide-up"
+                className="text-center space-y-3 animate-slide-up w-40"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Icon className="w-8 h-8 text-primary" />
+                <div className="mx-auto w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Icon className="w-7 h-7 text-primary" />
                 </div>
-                <div className="space-y-2">
-                  <div className="text-4xl font-bold text-foreground">{stat.value}</div>
-                  <div className="text-muted-foreground font-medium">{stat.label}</div>
+                <div className="space-y-1">
+                  <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+                  <div className="text-muted-foreground font-medium text-sm">{stat.label}</div>
                 </div>
               </div>
             );
           })}
         </section>
         {/* Features/Links Section */}
-        <section style={{ marginTop: '1rem' }}>
-          <h2 style={{ fontSize: '1.75rem', marginBottom: '2rem', color: 'var(--color-primary)', textAlign: 'center', fontWeight: '600' }}>Discover Our Work</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div 
-                  key={feature.title}
-                  className="modern-card group"
-                  style={{ animationDelay: `${index * 0.2}s` }}
-                >
-                  <div className="space-y-6">
-                    <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Icon className="w-8 h-8 text-primary" />
-                    </div>
-                    <div className="space-y-4">
-                      <h3 className="text-2xl font-semibold">{feature.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-                      <Link 
-                        to={feature.link}
-                        className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors group"
-                      >
-                        Learn more 
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+        <section className="mb-16">
+          <h2 className="text-xl md:text-2xl font-semibold mb-6 text-primary">Get Started</h2>
+          <div className="flex flex-col gap-6">
+            {features.map((feature, index) => (
+              <Link
+                key={index}
+                to={feature.link}
+                className={`feature-fade-in${index} feature-hover-pop w-full`}
+                style={{
+                  background: 'rgba(255,255,255,0.95)',
+                  borderRadius: '1rem',
+                  boxShadow: '0 2px 12px 0 rgba(31,38,135,0.08)',
+                  padding: '2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  cursor: 'pointer',
+                  animation: `fadeInUp 0.7s ease ${index * 0.15 + 0.1}s both`,
+                  transition: 'transform 0.35s cubic-bezier(.4,2,.6,1), opacity 0.35s cubic-bezier(.4,2,.6,1)',
+                  textDecoration: 'none',
+                }}
+              >
+                <h3 className="text-lg md:text-xl font-semibold mb-2 text-primary" style={{ margin: 0 }}>{feature.title}</h3>
+                <p className="text-muted-foreground mb-3 text-base md:text-lg" style={{ margin: 0 }}>{feature.description}</p>
+                <span style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'underline', fontSize: '1rem' }}>
+                  Learn more &rarr;
+                </span>
+              </Link>
+            ))}
           </div>
         </section>
       </main>
@@ -133,6 +114,19 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      <style>{`
+        @keyframes fadeInUp {
+          0% { opacity: 0; transform: translateY(32px) scale(0.98); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .feature-hover-pop {
+          transition: transform 0.35s cubic-bezier(.4,2,.6,1), opacity 0.35s cubic-bezier(.4,2,.6,1);
+        }
+        .feature-hover-pop:hover {
+          transform: scale(1.07);
+          opacity: 0.96;
+        }
+      `}</style>
     </div>
   );
 };

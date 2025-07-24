@@ -55,7 +55,7 @@ const journals = [
   },
 ];
 
-const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
+const bgImage = '/bg-illustration.jpg';
 
 const Journal = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -90,9 +90,9 @@ const Journal = () => {
 
   return (
     <div
-      className="min-h-screen bg-background relative"
+      className="min-h-screen relative"
       style={{
-        background: `url(${bgImage}) center/cover no-repeat fixed, linear-gradient(135deg, #e0e7ef 0%, #f8fafc 100%)`,
+        background: `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url(${bgImage}) center/cover no-repeat fixed`,
       }}
     >
       <Navigation />
