@@ -121,14 +121,14 @@ const Index = () => {
         </section>
       </main>
       <footer>
-        <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <div style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+        <div style={{ maxWidth: 960, margin: '16px auto 0 auto', padding: '4px 0' }}>
+          <div style={{ fontWeight: 600, color: 'var(--color-primary)', fontSize: '0.9rem' }}>
             Institute for Global Research
           </div>
-          <div style={{ fontSize: '1rem', color: 'var(--color-muted)', margin: '0.5rem 0' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--color-muted)', margin: '0.15rem 0' }}>
             Advancing knowledge through collaborative research and evidence-based solutions.
           </div>
-          <div style={{ fontSize: '0.9rem', color: 'var(--color-muted)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>
             © 2024 Institute for Global Research. All rights reserved.
           </div>
         </div>

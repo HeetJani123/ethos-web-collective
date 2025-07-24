@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 const categories = [
   'All',
@@ -18,37 +21,37 @@ const journals = [
     title: 'The Future of Digital Democracy',
     excerpt: 'Exploring innovations in civic participation and governance.',
     category: 'Democratic Governance',
-    content: 'Full article content for The Future of Digital Democracy...'
+    content: 'The intersection of technology and democratic governance has become one of the most fascinating areas of political research in the 21st century. As digital tools reshape how citizens engage with government, we find ourselves at a critical juncture in the evolution of democratic institutions.\n\nGlobal Digital Democracy Initiatives: Our comprehensive study examined digital democratic innovations across five continents, from Estonia\'s e-residency program to Taiwan\'s vTaiwan platform. These experiments offer valuable insights into how technology can enhance civic participation while maintaining the integrity of democratic processes.\n\nKey Findings: Increased Participation, Enhanced Transparency, Deliberative Quality.\n\nChallenges and Considerations: Digital divides can exacerbate existing inequalities in political participation. Cybersecurity concerns and the potential for manipulation require robust safeguards. Most critically, the design of digital democratic tools must be guided by democratic principles, not technological possibilities alone.\n\nRecommendations: Invest in digital literacy programs, establish clear privacy and security standards, and maintain multiple channels for civic participation to ensure inclusivity.'
   },
   {
     title: 'Carbon Pricing in Developing Economies',
     excerpt: 'A comparative study of market mechanisms and social impact.',
     category: 'Climate Policy',
-    content: 'Full article content for Carbon Pricing in Developing Economies...'
+    content: 'This comprehensive study examines the implementation and effectiveness of carbon pricing mechanisms in emerging markets, with specific focus on economic and social impacts.\n\nWe analyze case studies from Latin America, Southeast Asia, and Africa, highlighting both successes and challenges.\n\nKey Points: Market-based solutions, social equity, and policy recommendations for sustainable growth.'
   },
   {
     title: 'AI Ethics in Healthcare',
     excerpt: 'Balancing innovation and patient rights in a digital age.',
     category: 'Technology & Society',
-    content: 'Full article content for AI Ethics in Healthcare...'
+    content: 'As artificial intelligence becomes increasingly prevalent in healthcare, this paper explores the ethical frameworks needed to ensure responsible implementation.\n\nTopics include patient privacy, algorithmic bias, and the future of medical decision-making.'
   },
   {
     title: 'Universal Basic Income: Global Pilots',
     excerpt: 'Meta-analysis of UBI programs and their outcomes.',
     category: 'Social Innovation',
-    content: 'Full article content for Universal Basic Income...'
+    content: 'A meta-analysis of UBI pilot programs worldwide, examining their impact on poverty reduction, employment patterns, and social outcomes.\n\nWe review data from Finland, Kenya, and the United States.'
   },
   {
     title: 'Post-Pandemic Economic Recovery',
     excerpt: 'Fiscal and monetary policy responses to COVID-19.',
     category: 'Economic Policy',
-    content: 'Full article content for Post-Pandemic Economic Recovery...'
+    content: 'An examination of fiscal and monetary policy responses to COVID-19, analyzing their effectiveness and implications for future crisis management.\n\nIncludes lessons learned and recommendations for policymakers.'
   },
   {
     title: 'Youth Policy Innovations',
     excerpt: 'New approaches to youth engagement and empowerment.',
     category: 'Social Innovation',
-    content: 'Full article content for Youth Policy Innovations...'
+    content: 'This article explores new approaches to youth engagement and empowerment, including participatory budgeting, youth parliaments, and digital activism.'
   },
 ];
 
@@ -58,6 +61,24 @@ const Journal = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [modal, setModal] = useState<{title: string, content: string} | null>(null);
+  const { user } = useAuth();
+  const [canPost, setCanPost] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (user?.email) {
+        const { data, error } = await (supabase as any)
+          .from('journal_admins')
+          .select('email')
+          .eq('email', user.email)
+          .single();
+        setCanPost(!!data && !error);
+      }
+      setCheckedAuth(true);
+    };
+    checkAdmin();
+  }, [user]);
 
   const filteredJournals = journals.filter(journal => {
     const matchesSearch =
@@ -83,7 +104,18 @@ const Journal = () => {
               Explore our latest research insights, policy analyses, and scholarly contributions.
             </p>
           </div>
-          
+          {/* Authenticated Post UI */}
+          <div className="mb-8 flex justify-center">
+            {!user && (
+              <div className="text-muted-foreground">Sign in to post a journal entry.</div>
+            )}
+            {user && checkedAuth && canPost && (
+              <Button variant="default">Post Journal</Button>
+            )}
+            {user && checkedAuth && !canPost && (
+              <div className="text-muted-foreground">You are not authorized to post.</div>
+            )}
+          </div>
           {/* Search and Categories */}
           <div className="mb-16 space-y-8">
             <div className="flex justify-center">
@@ -97,7 +129,6 @@ const Journal = () => {
                 />
               </div>
             </div>
-            
             <div className="flex flex-wrap gap-3 justify-center max-w-4xl mx-auto">
               {categories.map(category => (
                 <Button
@@ -115,8 +146,9 @@ const Journal = () => {
           {/* Journal Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredJournals.map((journal, i) => (
-              <div
+              <Link
                 key={i}
+                to={`/journal/${i}`}
                 className="group relative backdrop-blur-lg bg-white/20 border border-white/30 rounded-2xl shadow-xl p-8 flex flex-col gap-4 cursor-pointer hover:scale-[1.03] transition-all duration-500 glass-card overflow-hidden"
                 style={{
                   boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
@@ -124,22 +156,21 @@ const Journal = () => {
                   background: 'rgba(255,255,255,0.18)',
                   backdropFilter: 'blur(16px)',
                   WebkitBackdropFilter: 'blur(16px)',
+                  textDecoration: 'none',
                 }}
-                onClick={() => setModal({ title: journal.title, content: journal.content })}
               >
                 {/* Content that blurs on hover */}
                 <div className="group-hover:blur-sm transition-all duration-300 relative z-10">
                   <h3 className="text-2xl font-semibold text-foreground mb-4">{journal.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">{journal.excerpt}</p>
                 </div>
-                
                 {/* Read More overlay */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
                   <div className="text-lg font-semibold text-primary bg-background/95 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-primary/30 transform scale-95 group-hover:scale-100 transition-transform duration-300">
                     Read More
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

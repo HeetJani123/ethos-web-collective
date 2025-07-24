@@ -1,151 +1,109 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  Heart, 
-  MessageCircle, 
-  Share2, 
-  Calendar, 
-  User, 
-  ArrowLeft,
-  ThumbsUp
-} from 'lucide-react';
+import { Heart, MessageCircle, Share2, Calendar, User, ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { AuthDialog } from '@/components/AuthDialog';
+
+// Use the same journals array as in Journal.tsx
+const journals = [
+  {
+    title: 'The Future of Digital Democracy',
+    content: `The intersection of technology and democratic governance has become one of the most fascinating areas of political research in the 21st century. As digital tools reshape how citizens engage with government, we find ourselves at a critical juncture in the evolution of democratic institutions.\n\nGlobal Digital Democracy Initiatives: Our comprehensive study examined digital democratic innovations across five continents, from Estonia's e-residency program to Taiwan's vTaiwan platform. These experiments offer valuable insights into how technology can enhance civic participation while maintaining the integrity of democratic processes.\n\nKey Findings: Increased Participation, Enhanced Transparency, Deliberative Quality.\n\nChallenges and Considerations: Digital divides can exacerbate existing inequalities in political participation. Cybersecurity concerns and the potential for manipulation require robust safeguards. Most critically, the design of digital democratic tools must be guided by democratic principles, not technological possibilities alone.\n\nRecommendations: Invest in digital literacy programs, establish clear privacy and security standards, and maintain multiple channels for civic participation to ensure inclusivity.`,
+    author: 'Dr. Sarah Chen',
+    date: '2024-01-15',
+    category: 'Democratic Governance',
+    readTime: '8 min read',
+    tags: ['digital democracy', 'civic engagement', 'governance', 'technology policy']
+  },
+  {
+    title: 'Carbon Pricing in Developing Economies',
+    content: `This comprehensive study examines the implementation and effectiveness of carbon pricing mechanisms in emerging markets, with specific focus on economic and social impacts.\n\nWe analyze case studies from Latin America, Southeast Asia, and Africa, highlighting both successes and challenges.\n\nKey Points: Market-based solutions, social equity, and policy recommendations for sustainable growth.`,
+    author: 'Prof. Michael Rodriguez',
+    date: '2024-01-10',
+    category: 'Climate Policy',
+    readTime: '12 min read',
+    tags: ['carbon pricing', 'climate policy', 'emerging markets']
+  },
+  {
+    title: 'AI Ethics in Healthcare',
+    content: `As artificial intelligence becomes increasingly prevalent in healthcare, this paper explores the ethical frameworks needed to ensure responsible implementation.\n\nTopics include patient privacy, algorithmic bias, and the future of medical decision-making.`,
+    author: 'Dr. Elena Petrov',
+    date: '2024-01-08',
+    category: 'Technology & Society',
+    readTime: '6 min read',
+    tags: ['AI', 'ethics', 'healthcare']
+  },
+  {
+    title: 'Universal Basic Income: Global Pilots',
+    content: `A meta-analysis of UBI pilot programs worldwide, examining their impact on poverty reduction, employment patterns, and social outcomes.\n\nWe review data from Finland, Kenya, and the United States.`,
+    author: 'Dr. Amara Okafor',
+    date: '2024-01-05',
+    category: 'Social Innovation',
+    readTime: '10 min read',
+    tags: ['UBI', 'social innovation', 'poverty reduction']
+  },
+  {
+    title: 'Post-Pandemic Economic Recovery',
+    content: `An examination of fiscal and monetary policy responses to COVID-19, analyzing their effectiveness and implications for future crisis management.\n\nIncludes lessons learned and recommendations for policymakers.`,
+    author: 'Dr. James Kim',
+    date: '2024-01-02',
+    category: 'Economic Policy',
+    readTime: '9 min read',
+    tags: ['economic policy', 'COVID-19', 'recovery']
+  },
+  {
+    title: 'Youth Policy Innovations',
+    content: `This article explores new approaches to youth engagement and empowerment, including participatory budgeting, youth parliaments, and digital activism.`,
+    author: 'Dr. Amara Okafor',
+    date: '2024-01-01',
+    category: 'Social Innovation',
+    readTime: '7 min read',
+    tags: ['youth', 'policy', 'empowerment']
+  },
+];
 
 const BlogPost = () => {
   const { id } = useParams();
-  const { toast } = useToast();
-  const { user, profile } = useAuth();
-  const [newComment, setNewComment] = useState('');
+  const index = Number(id);
+  const post = journals[index];
+
+  // Demo Like/Comment state
   const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(45);
-  const [comments, setComments] = useState<any[]>([]);
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [likes, setLikes] = useState(0);
+  const [comments, setComments] = useState<string[]>([]);
+  const [newComment, setNewComment] = useState('');
 
-  // Mock post data (in a real app, this would come from an API)
-  const post = {
-    id: 1,
-    title: "The Future of Digital Democracy: Lessons from Global Experiments",
-    content: `
-      <p>The intersection of technology and democratic governance has become one of the most fascinating areas of political research in the 21st century. As digital tools reshape how citizens engage with government, we find ourselves at a critical juncture in the evolution of democratic institutions.</p>
-
-      <h3>Global Digital Democracy Initiatives</h3>
-      <p>Our comprehensive study examined digital democratic innovations across five continents, from Estonia's e-residency program to Taiwan's vTaiwan platform. These experiments offer valuable insights into how technology can enhance civic participation while maintaining the integrity of democratic processes.</p>
-
-      <h3>Key Findings</h3>
-      <p>Three primary patterns emerged from our analysis:</p>
-      <ul>
-        <li><strong>Increased Participation:</strong> Digital platforms consistently showed higher engagement rates among younger demographics, with participation increasing by an average of 23% in studied cases.</li>
-        <li><strong>Enhanced Transparency:</strong> Real-time access to government data and decision-making processes improved public trust in institutions by measurable margins.</li>
-        <li><strong>Deliberative Quality:</strong> Well-designed digital platforms fostered more substantive policy discussions compared to traditional public forums.</li>
-      </ul>
-
-      <h3>Challenges and Considerations</h3>
-      <p>However, our research also revealed significant challenges. Digital divides can exacerbate existing inequalities in political participation. Cybersecurity concerns and the potential for manipulation require robust safeguards. Most critically, the design of digital democratic tools must be guided by democratic principles, not technological possibilities alone.</p>
-
-      <h3>Recommendations for Implementation</h3>
-      <p>Based on our findings, we recommend a gradual, evidence-based approach to digital democracy implementation. This includes investing in digital literacy programs, establishing clear privacy and security standards, and maintaining multiple channels for civic participation to ensure inclusivity.</p>
-
-      <p>The future of digital democracy lies not in replacing traditional democratic institutions, but in thoughtfully augmenting them with technology that serves democratic values and expands meaningful participation for all citizens.</p>
-    `,
-    author: "Dr. Sarah Chen",
-    date: "2024-01-15",
-    category: "Democratic Governance",
-    readTime: "8 min read",
-    tags: ["digital democracy", "civic engagement", "governance", "technology policy"]
-  };
-
-  // Load comments from database
-  useEffect(() => {
-    loadComments();
-  }, [id]);
-
-  const loadComments = async () => {
-    if (!id) return;
-    
-    try {
-      const { data: commentsData, error } = await supabase
-        .from('comments')
-        .select(`
-          id,
-          content,
-          created_at,
-          profiles!inner(display_name)
-        `)
-        .eq('article_id', id)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-
-      setComments(commentsData || []);
-    } catch (error) {
-      console.error('Error loading comments:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center text-muted-foreground py-32 text-xl">Article not found.</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const handleLike = () => {
-    setLiked(!liked);
-    setLikes(prev => liked ? prev - 1 : prev + 1);
-    toast({
-      description: liked ? "Removed from favorites" : "Added to favorites",
-    });
+    setLiked((prev) => !prev);
+    setLikes((prev) => (liked ? prev - 1 : prev + 1));
   };
 
-  const handleComment = async () => {
-    if (!user) {
-      setAuthDialogOpen(true);
-      return;
-    }
-
+  const handleComment = () => {
     if (!newComment.trim()) return;
-
-    try {
-      const { error } = await supabase
-        .from('comments')
-        .insert({
-          article_id: id,
-          author_id: user.id,
-          content: newComment.trim()
-        });
-
-      if (error) throw error;
-
-      setNewComment('');
-      loadComments(); // Reload comments
-      toast({
-        description: "Comment posted successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      description: "Link copied to clipboard",
-    });
+    setComments((prev) => [...prev, newComment.trim()]);
+    setNewComment('');
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
       <main className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Navigation */}
@@ -188,9 +146,9 @@ const BlogPost = () => {
                   <Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} />
                   <span>{likes}</span>
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleShare}>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
+                <Button variant="outline" size="sm" onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}>
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Comment
                 </Button>
               </div>
             </div>
@@ -198,12 +156,14 @@ const BlogPost = () => {
             {/* Article Content */}
             <div 
               className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-muted-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-ul:text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+              style={{ whiteSpace: 'pre-line' }}
+              >
+              {post.content}
+            </div>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 pt-8 border-t border-border">
-              {post.tags.map((tag, index) => (
+              {post.tags && post.tags.map((tag, index) => (
                 <Badge key={index} variant="outline">
                   {tag}
                 </Badge>
@@ -217,56 +177,45 @@ const BlogPost = () => {
               <h3 className="text-2xl font-serif font-semibold">
                 Discussion ({comments.length})
               </h3>
-              
-              {/* Add Comment */}
               <Card>
                 <CardContent className="p-6 space-y-4">
                   <Textarea
-                    placeholder={user ? "Share your thoughts on this research..." : "Sign in to comment on this article..."}
+                    placeholder={"Share your thoughts on this research..."}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     className="min-h-[100px]"
-                    disabled={!user}
                   />
                   <div className="flex justify-end">
                     <Button onClick={handleComment} disabled={!newComment.trim()}>
                       <MessageCircle className="h-4 w-4 mr-2" />
-                      {user ? "Post Comment" : "Sign in to Comment"}
+                      Post Comment
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
-
             {/* Comments List */}
             <div className="space-y-6">
-              {loading ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  Loading comments...
-                </div>
-              ) : comments.length === 0 ? (
+              {comments.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   No comments yet. Be the first to share your thoughts!
                 </div>
               ) : (
-                comments.map((comment) => (
-                  <Card key={comment.id}>
+                comments.map((comment, idx) => (
+                  <Card key={idx}>
                     <CardContent className="p-6">
                       <div className="flex space-x-4">
                         <Avatar>
                           <AvatarFallback>
-                            {comment.profiles?.display_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                            U
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center space-x-2">
-                            <span className="font-medium">{comment.profiles?.display_name || 'Anonymous'}</span>
-                            <span className="text-sm text-muted-foreground">
-                              {new Date(comment.created_at).toLocaleDateString()}
-                            </span>
+                            <span className="font-medium">Anonymous</span>
                           </div>
                           <p className="text-muted-foreground leading-relaxed">
-                            {comment.content}
+                            {comment}
                           </p>
                         </div>
                       </div>
@@ -278,8 +227,6 @@ const BlogPost = () => {
           </section>
         </div>
       </main>
-      
-      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 };
