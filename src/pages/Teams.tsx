@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
 
+const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
+
 const Teams = () => {
   const teams = [
     {
@@ -79,7 +81,12 @@ const Teams = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen relative"
+      style={{
+        background: `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url(${bgImage}) center/cover no-repeat fixed`,
+      }}
+    >
       <Navigation />
       
       <main className="py-16">

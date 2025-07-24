@@ -27,7 +27,7 @@ const features = [
   },
 ];
 
-const heroImageUrl = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1920&q=80';
+const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80';
 
 const HeroButton = ({ children, variant = "default", ...props }: any) => {
   const magneticRef = useMagneticButton(0.2);
@@ -46,120 +46,50 @@ const HeroButton = ({ children, variant = "default", ...props }: any) => {
 };
 
 const Index = () => {
-  const parallaxRef = useParallax(-0.3);
-  const slowParallaxRef = useParallax(-0.1);
-
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen relative"
+      style={{
+        background: `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url(${bgImage}) center/cover no-repeat fixed`,
+      }}
+    >
       <Navigation />
-      
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center hero-bg parallax-container overflow-hidden">
-        {/* Parallax Background Image */}
-        <div 
-          ref={parallaxRef}
-          className="absolute inset-0 parallax-element"
-          style={{
-            backgroundImage: `url(${heroImageUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
-            filter: 'brightness(0.7) blur(0.5px)',
-          }}
-        />
-        
-        {/* Animated overlay */}
-        <div 
-          ref={slowParallaxRef}
-          className="absolute inset-0 parallax-element bg-gradient-to-br from-primary/20 via-transparent to-purple-600/20"
-        />
-        
-        {/* Content */}
-        <div className="relative z-10 container text-center text-white">
-          <div className="space-y-8 animate-fade-in">
-            <h1 className="text-6xl md:text-7xl font-bold leading-tight">
-              Advancing Knowledge Through
-              <span className="block bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Collaborative Research
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed opacity-90">
-              We are a leading research institution dedicated to addressing the world's most 
-              pressing challenges through innovative interdisciplinary collaboration and 
-              evidence-based solutions.
-            </p>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-              <HeroButton asChild>
-                <Link to="/teams">
-                  Explore Our Research
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </HeroButton>
-              <HeroButton variant="outline" asChild>
-                <Link to="/journal">
-                  View Publications
-                </Link>
-              </HeroButton>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating particles effect */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 1.5}s`,
-                animationDuration: `${6 + i}s`,
-              }}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 bg-muted/50">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <div 
-                  key={stat.label} 
-                  className="text-center space-y-4 animate-slide-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <Icon className="w-8 h-8 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-4xl font-bold text-foreground">{stat.value}</div>
-                    <div className="text-muted-foreground font-medium">{stat.label}</div>
-                  </div>
+      {/* Original content structure below (no glassmorphism on containers) */}
+      <main className="container" style={{ maxWidth: 960, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        {/* Hero Section */}
+        <section style={{ textAlign: 'center', padding: '3rem 0 2rem 0' }}>
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>
+            Advancing Knowledge Through Collaborative Research
+          </h1>
+          <p style={{ fontSize: '1.25rem', color: 'var(--color-muted)', marginBottom: '2.5rem' }}>
+            We are a leading research institution dedicated to addressing the world's most pressing challenges through innovative interdisciplinary collaboration and evidence-based solutions.
+          </p>
+        </section>
+        {/* Stats Section */}
+        <section style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <div 
+                key={stat.label} 
+                className="text-center space-y-4 animate-slide-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Icon className="w-8 h-8 text-primary" />
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Get Started</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Explore our research initiatives and discover how we're making a difference
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <div className="text-4xl font-bold text-foreground">{stat.value}</div>
+                  <div className="text-muted-foreground font-medium">{stat.label}</div>
+                </div>
+              </div>
+            );
+          })}
+        </section>
+        {/* Features/Links Section */}
+        <section>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--color-primary)' }}>Get Started</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
@@ -188,20 +118,18 @@ const Index = () => {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-muted/30 border-t">
-        <div className="container py-12">
-          <div className="text-center space-y-4">
-            <h3 className="text-2xl font-bold text-foreground">Institute for Global Research</h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Advancing knowledge through collaborative research and evidence-based solutions for a better world.
-            </p>
-            <div className="text-sm text-muted-foreground">
-              © 2024 Institute for Global Research. All rights reserved.
-            </div>
+        </section>
+      </main>
+      <footer>
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
+          <div style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+            Institute for Global Research
+          </div>
+          <div style={{ fontSize: '1rem', color: 'var(--color-muted)', margin: '0.5rem 0' }}>
+            Advancing knowledge through collaborative research and evidence-based solutions.
+          </div>
+          <div style={{ fontSize: '0.9rem', color: 'var(--color-muted)' }}>
+            © 2024 Institute for Global Research. All rights reserved.
           </div>
         </div>
       </footer>
