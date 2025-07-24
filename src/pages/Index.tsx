@@ -66,7 +66,7 @@ const Index = () => {
           </p>
         </section>
         {/* Stats Section */}
-        <section style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+        <section style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -87,9 +87,9 @@ const Index = () => {
           })}
         </section>
         {/* Features/Links Section */}
-        <section>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--color-primary)' }}>Get Started</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <section style={{ marginTop: '1rem' }}>
+          <h2 style={{ fontSize: '1.75rem', marginBottom: '2rem', color: 'var(--color-primary)', textAlign: 'center', fontWeight: '600' }}>Discover Our Work</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', maxWidth: '800px', margin: '0 auto' }}>
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (

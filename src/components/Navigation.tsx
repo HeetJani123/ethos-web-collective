@@ -38,10 +38,10 @@ const Navigation = () => {
   return (
     <>
       <nav
-        className={`border-b border-border sticky top-0 z-50 backdrop-blur transition-all duration-300 ${
+        className={`border-b border-border/30 sticky top-0 z-50 backdrop-blur transition-all duration-300 ${
           scrolled
-            ? 'bg-background/60 shadow-lg' // transparent with shadow
-            : 'bg-background/95'
+            ? 'bg-background/40 shadow-lg' // more transparent with shadow
+            : 'bg-background/60'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
