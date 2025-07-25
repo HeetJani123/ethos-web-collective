@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const categories = [
   'All',
@@ -19,14 +20,25 @@ const bgImage = 'https://images.unsplash.com/photo-1464983953574-0892a716854b?au
 
 const Journal = () => {
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canPost, setCanPost] = useState(false);
 
   useEffect(() => {
     fetchArticles();
   }, []);
+
+  useEffect(() => {
+    // Check if user is a member who can post
+    if (user && profile) {
+      setCanPost(profile.is_member || false);
+    } else {
+      setCanPost(false);
+    }
+  }, [user, profile]);
 
   const fetchArticles = async () => {
     try {
@@ -74,6 +86,32 @@ const Journal = () => {
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Explore our latest research insights, policy analyses, and scholarly contributions.
             </p>
+          </div>
+          
+          {/* Post Article Section */}
+          <div className="mb-12 flex justify-center">
+            {!user && (
+              <div className="text-center">
+                <p className="text-muted-foreground mb-2">Want to contribute?</p>
+                <Button variant="outline">Sign in to post articles</Button>
+              </div>
+            )}
+            {user && !canPost && (
+              <div className="text-center">
+                <p className="text-muted-foreground">Contact admin to become a member and post articles</p>
+              </div>
+            )}
+            {user && canPost && (
+              <Button 
+                className="px-8 py-3 text-lg"
+                onClick={() => {
+                  // TODO: Implement article creation modal or navigate to create page
+                  console.log('Post article clicked');
+                }}
+              >
+                Post New Article
+              </Button>
+            )}
           </div>
           
           {/* Search and Categories */}
