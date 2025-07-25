@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      allowed_authors: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: number
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: never
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: never
+        }
+        Relationships: []
+      }
       article_likes: {
         Row: {
           article_id: string
