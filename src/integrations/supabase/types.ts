@@ -63,7 +63,7 @@ export type Database = {
       }
       articles: {
         Row: {
-          author_id: string
+          author_id: string | null
           content: string
           excerpt: string | null
           id: string
@@ -73,7 +73,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          author_id: string
+          author_id?: string | null
           content: string
           excerpt?: string | null
           id?: string
@@ -83,7 +83,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          author_id?: string
+          author_id?: string | null
           content?: string
           excerpt?: string | null
           id?: string
