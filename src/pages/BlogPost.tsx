@@ -255,7 +255,7 @@ const BlogPost = () => {
                   <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                     <div className="flex items-center space-x-1">
                       <User className="h-4 w-4" />
-                      <span>{article.profiles?.display_name || 'Anonymous'}</span>
+                      <span>{article.author_name || article.profiles?.display_name || 'Anonymous'}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />

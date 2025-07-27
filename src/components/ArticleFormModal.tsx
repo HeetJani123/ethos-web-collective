@@ -18,6 +18,7 @@ interface ArticleFormModalProps {
 
 export const ArticleFormModal: React.FC<ArticleFormModalProps> = ({ open, onOpenChange, isMember, user, onArticlePosted }) => {
   const [title, setTitle] = useState('');
+  const [authorName, setAuthorName] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState<string[]>([]);
@@ -63,6 +64,7 @@ export const ArticleFormModal: React.FC<ArticleFormModalProps> = ({ open, onOpen
     try {
       const { error } = await supabase.from('articles').insert({
         title,
+        author_name: authorName,
         excerpt,
         content,
         author_id: user.id,
@@ -73,7 +75,7 @@ export const ArticleFormModal: React.FC<ArticleFormModalProps> = ({ open, onOpen
       if (error) throw error;
       toast({ title: 'Success', description: 'Article posted successfully!' });
       onOpenChange(false);
-      setTitle(''); setExcerpt(''); setContent(''); setTags([]); setCategory('');
+      setTitle(''); setAuthorName(''); setExcerpt(''); setContent(''); setTags([]); setCategory('');
       if (onArticlePosted) onArticlePosted();
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
@@ -110,6 +112,17 @@ export const ArticleFormModal: React.FC<ArticleFormModalProps> = ({ open, onOpen
                 placeholder="Enter article title"
                 required
                 className="text-2xl font-serif px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-base font-medium mb-1">Author Name</label>
+              <Input
+                type="text"
+                value={authorName}
+                onChange={e => setAuthorName(e.target.value)}
+                placeholder="Enter author name"
+                required
+                className="px-3 py-2"
               />
             </div>
             <div>
