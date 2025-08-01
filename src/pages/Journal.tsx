@@ -72,126 +72,139 @@ const Journal = () => {
   };
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden">
+    <div className="page-container">
       <Navigation />
-      {/* Subtle overlay for readability */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: `linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(240,244,255,0.85) 100%), url(${bgImage}) center/cover no-repeat fixed`,
-          pointerEvents: 'none',
-        }}
-      />
-      <div className="relative z-10">
-        <main className="pt-24 pb-20 bg-background/80 min-h-screen transition-all duration-300"> 
-          <div className="container max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Research Journal</h1>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Explore our latest research insights, policy analyses, and scholarly contributions.
-              </p>
-            </div>
+      <main className="container py-8">
+        {/* Hero Section */}
+        <section className="hero-bg text-center py-16 mb-12">
+          <div className="content-overlay max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-primary/80 to-accent bg-clip-text text-transparent">
+              Research Journal
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
+              Explore cutting-edge research, insights, and discoveries from our global community of scholars.
+            </p>
             
             {/* Post Article Section */}
-            <div className="mb-12 flex justify-center">
-              {user && canPost && (
-                <>
-                  <Button 
-                    className="px-8 py-3 text-lg"
-                    onClick={() => setArticleModalOpen(true)}
-                  >
-                    Post New Article
-                  </Button>
-                  <ArticleFormModal
-                    open={articleModalOpen}
-                    onOpenChange={setArticleModalOpen}
-                    isMember={profile?.is_member}
-                    user={user}
-                    onArticlePosted={fetchArticles}
-                  />
-                </>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              {!user ? (
+                <p className="text-muted-foreground">
+                  <Button variant="outline" className="mr-2">Sign in</Button> 
+                  to contribute to our research journal
+                </p>
+              ) : !canPost ? (
+                <p className="text-muted-foreground">
+                  Contact admin to become a member and contribute articles
+                </p>
+              ) : (
+                <Button 
+                  onClick={() => setArticleModalOpen(true)}
+                  className="magnetic-btn"
+                  size="lg"
+                >
+                  Post New Article
+                </Button>
               )}
             </div>
-            
-            {/* Search and Categories */}
-            <div className="mb-16 space-y-8">
-              <div className="flex justify-center">
-                <div className="relative max-w-xl w-full">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    placeholder="Search articles..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="pl-12 pr-4 py-3 text-lg border-2 rounded-xl bg-background/50 backdrop-blur-sm"
-                  />
+          </div>
+        </section>
+
+        {/* Search and Filters */}
+        <div className="glass p-6 rounded-2xl mb-8">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search articles..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-background/50 border-0 backdrop-blur"
+              />
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {categories.map((category) => (
+                <Badge
+                  key={category}
+                  variant={selectedCategory === category ? 'default' : 'outline'}
+                  className="cursor-pointer px-4 py-2 hover:scale-105 transition-transform"
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Articles Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="modern-card h-64 animate-pulse">
+                <div className="h-4 bg-muted rounded mb-4"></div>
+                <div className="h-3 bg-muted rounded mb-2"></div>
+                <div className="h-3 bg-muted rounded mb-2"></div>
+                <div className="h-3 bg-muted rounded w-2/3"></div>
+              </div>
+            ))
+          ) : filteredArticles.length > 0 ? (
+            filteredArticles.map((article, index) => (
+              <div
+                key={article.id}
+                className="modern-card group cursor-pointer h-full flex flex-col"
+                style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={() => handleArticleClick(article.id)}
+              >
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                    {article.title}
+                  </h2>
+                  
+                  {article.category && (
+                    <Badge variant="secondary" className="mb-3">
+                      {article.category}
+                    </Badge>
+                  )}
+                  
+                  <p className="text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
+                    {article.excerpt || 'No excerpt available'}
+                  </p>
+                </div>
+                
+                {/* Read More overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none rounded-2xl">
+                  <div className="text-lg font-semibold text-primary bg-background/95 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-primary/30 transform scale-95 group-hover:scale-100 transition-transform duration-300">
+                    Read More
+                  </div>
                 </div>
               </div>
-              
-              <div className="flex flex-wrap gap-3 justify-center max-w-4xl mx-auto">
-                {categories.map(category => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? 'default' : 'outline'}
-                    size="default"
-                    onClick={() => setSelectedCategory(category)}
-                    className="px-6 py-2 rounded-full transition-all duration-300"
-                  >
-                    {category}
-                  </Button>
-                ))}
+            ))
+          ) : (
+            <div className="col-span-full text-center py-16">
+              <div className="glass p-12 rounded-3xl max-w-md mx-auto">
+                <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-semibold mb-2">No articles found</h3>
+                <p className="text-muted-foreground">
+                  {searchTerm || selectedCategory !== 'All' 
+                    ? 'Try adjusting your search or filter criteria'
+                    : 'Be the first to contribute to our research journal'}
+                </p>
               </div>
             </div>
-            
-            {/* Loading State */}
-            {loading ? (
-              <div className="text-center py-12">
-                <p className="text-lg text-muted-foreground">Loading articles...</p>
-              </div>
-            ) : (
-              /* Journal Cards */
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {filteredArticles.map((article) => (
-                  <div key={article.id} className="mb-8">
-                    <div
-                      className="group relative bg-white/20 border border-white/30 rounded-2xl shadow-xl p-8 flex flex-col gap-4 cursor-pointer hover:scale-[1.03] transition-all duration-500 glass-card overflow-hidden"
-                      style={{
-                        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
-                        border: '1px solid rgba(255,255,255,0.25)',
-                        background: 'rgba(255,255,255,0.18)',
-                        backdropFilter: 'blur(16px)',
-                        WebkitBackdropFilter: 'blur(16px)',
-                      }}
-                      onClick={() => handleArticleClick(article.id)}
-                    >
-                      <div className="transition-all duration-300 group-hover:blur-sm">
-                        <h3 className="text-2xl font-semibold text-foreground mb-2">{article.title}</h3>
-                        {/* Category badge below the title and above the summary */}
-                        {article.category && (
-                          <div className="mb-2">
-                            <Badge className="bg-blue-100 text-blue-800 font-medium text-xs px-2 py-1">{article.category}</Badge>
-                          </div>
-                        )}
-                        <p className="text-muted-foreground leading-relaxed">{article.excerpt}</p>
-                      </div>
-                      {/* Read More overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none">
-                        <div className="text-lg font-semibold text-primary bg-background/95 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm border border-primary/30 transform scale-95 group-hover:scale-100 transition-transform duration-300">
-                          Read More
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {filteredArticles.length === 0 && (
-                  <div className="col-span-full text-center py-12">
-                    <p className="text-lg text-muted-foreground">No articles found.</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </main>
-      </div>
+          )}
+        </div>
+      </main>
+
+      {/* Article Modal */}
+      {user && canPost && (
+        <ArticleFormModal
+          open={articleModalOpen}
+          onOpenChange={setArticleModalOpen}
+          isMember={profile?.is_member}
+          user={user}
+          onArticlePosted={fetchArticles}
+        />
+      )}
     </div>
   );
 };
