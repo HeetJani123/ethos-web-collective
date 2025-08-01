@@ -4,6 +4,7 @@ import { Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthDialog } from './AuthDialog';
+import { ThemeToggle } from './ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,6 +69,10 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               {/* Auth Section */}
               {user ? (
                 <DropdownMenu>
@@ -131,6 +136,11 @@ const Navigation = () => {
                     {item.name}
                   </Link>
                 ))}
+                {/* Mobile Theme Toggle */}
+                <div className="pt-2 px-3">
+                  <ThemeToggle />
+                </div>
+                
                 {/* Mobile Auth */}
                 <div className="pt-4 border-t border-border">
                   {user ? (
