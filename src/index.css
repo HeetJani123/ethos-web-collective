@@ -7,52 +7,52 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600&display=swap');
 
 :root {
-  /* Light mode colors - Academic and scholarly */
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222.2 84% 4.9%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222.2 84% 4.9%;
+  /* Light mode colors - Modern and sophisticated */
+  --background: 255 255 255;
+  --foreground: 8 9 10;
+  --card: 255 255 255;
+  --card-foreground: 8 9 10;
+  --popover: 255 255 255;
+  --popover-foreground: 8 9 10;
+  --primary: 240 80% 50%;
+  --primary-foreground: 255 255 255;
+  --secondary: 243 248 255;
+  --secondary-foreground: 51 65 85;
+  --muted: 248 250 252;
+  --muted-foreground: 100 116 139;
+  --accent: 236 254 255;
+  --accent-foreground: 14 116 144;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 221.2 83.2% 53.3%;
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 240 80% 50%;
   --radius: 0.75rem;
   
-  /* Enhanced glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.15);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  --glass-hover: rgba(255, 255, 255, 0.25);
+  /* Enhanced glassmorphism - Light mode */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(226, 232, 240, 0.5);
+  --glass-shadow: 0 20px 40px rgba(148, 163, 184, 0.15);
+  --glass-hover: rgba(255, 255, 255, 0.95);
   
   /* Cursor effects */
   --cursor-size: 20px;
   --cursor-trail: rgba(59, 130, 246, 0.5);
   
   /* Enhanced scholarly gradients - Light mode */
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-hero: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-  --gradient-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
-  --gradient-glow: radial-gradient(ellipse at center, rgba(102, 126, 234, 0.2), transparent 70%);
-  --gradient-academic: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
-  --gradient-scholarly: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --gradient-hero: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(29, 78, 216, 0.05));
+  --gradient-background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.8));
+  --gradient-glow: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1), transparent 70%);
+  --gradient-academic: linear-gradient(45deg, #3b82f6, #1d4ed8, #0ea5e9, #06b6d4);
+  --gradient-scholarly: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 25%, #0ea5e9 50%, #06b6d4 75%, #0891b2 100%);
   
   /* Text colors for light mode */
-  --text-primary: #1a1a2e;
-  --text-secondary: #2d3748;
-  --text-muted: #718096;
-  --text-accent: #667eea;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-accent: #3b82f6;
 }
 
 .dark {
@@ -145,14 +145,14 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background: var(--gradient-background);
-  color: var(--text-primary);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   overflow-x: hidden;
   min-height: 100vh;
   position: relative;
 }
 
-/* Clean background with subtle overlays */
+/* Modern background with dynamic overlays */
 body::before {
   content: '';
   position: fixed;
@@ -161,8 +161,9 @@ body::before {
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 30% 30%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 70% 70%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 25% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 75% 80%, rgba(29, 78, 216, 0.03) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(226, 232, 240, 0.4) 100%);
   animation: subtle-float 40s ease-in-out infinite;
   z-index: -2;
   pointer-events: none;
