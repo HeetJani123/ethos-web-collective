@@ -75,9 +75,9 @@ const Journal = () => {
       <main className="flex-1 py-20">
         <div className="container">
           {/* Hero Section */}
-          <section className="hero-bg text-center py-16 mb-12">
-            <div className="content-overlay max-w-4xl mx-auto">
-              <h1 className="scholarly-text text-4xl md:text-6xl font-bold mb-6">
+          <section className="text-center py-16 mb-12 relative">
+            <div className="relative z-10">
+              <h1 className="interactive-text text-4xl md:text-6xl font-bold mb-6">
                 Research Journal
               </h1>
               <p className="text-xl text-secondary mb-8 leading-relaxed max-w-2xl mx-auto">
@@ -150,7 +150,7 @@ const Journal = () => {
               filteredArticles.map((article, index) => (
                 <div
                   key={article.id}
-                  className="modern-card group cursor-pointer h-full flex flex-col"
+                  className="modern-card interactive-card group cursor-pointer h-full flex flex-col"
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => handleArticleClick(article.id)}
                 >
