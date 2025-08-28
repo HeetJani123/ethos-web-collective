@@ -176,7 +176,7 @@ export const ArticleFormModal: React.FC<ArticleFormModalProps> = ({ open, onOpen
             <div>
               <label className="block text-base font-medium mb-1">Category</label>
               <select
-                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-neutral-900 text-black dark:text-white"
                 value={category}
                 onChange={e => setCategory(e.target.value)}
                 required

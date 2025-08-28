@@ -5,10 +5,10 @@ import { ArrowRight, Users, FileText, Globe, TrendingUp } from 'lucide-react';
 import { useMagneticButton } from '@/hooks/useMagneticButton';
 
 const stats = [
-  { label: 'Research Fellows', value: '150+', icon: Users },
-  { label: 'Countries Represented', value: '25+', icon: Globe },
-  { label: 'Publications', value: '500+', icon: FileText },
-  { label: 'Research Teams', value: '12', icon: TrendingUp },
+  { label: 'Research Fellows', value: '100+', icon: Users },
+  { label: 'Countries Represented', value: '8+', icon: Globe },
+  { label: 'Publications', value: '1', icon: FileText },
+  { label: 'Research Teams', value: '6', icon: TrendingUp },
 ];
 
 const features = [
@@ -36,10 +36,10 @@ const Index = () => {
           <div className="container">
             <div className="content-overlay max-w-4xl mx-auto">
               <h1 className="interactive-text text-4xl md:text-6xl font-bold mb-6">
-                Advancing Knowledge Through Collaborative Research
+                Advancing Knowledge Through Student Led Research
               </h1>
               <p className="text-xl md:text-2xl text-secondary mb-10 max-w-3xl mx-auto leading-relaxed">
-                We are a leading research institution dedicated to addressing the world's most pressing challenges through innovative interdisciplinary collaboration and evidence-based solutions.
+                We are an aspiring research institution dedicated to addressing the world's most pressing challenges through innovative research led by students and evidence-based solutions.
               </p>
               <Button size="lg" className="magnetic-btn">
                 Explore Our Work
@@ -117,13 +117,13 @@ const Index = () => {
       <footer className="glass mt-20 py-12">
         <div className="container text-center">
           <div className="interactive-text text-2xl font-bold mb-4">
-            Institute for Global Research
+            Youth Tech and Ethics Institute
           </div>
           <div className="text-secondary mb-2 max-w-md mx-auto">
-            Advancing knowledge through collaborative research and evidence-based solutions.
+            Advancing knowledge through student led research and evidence-based solutions.
           </div>
           <div className="text-sm text-muted">
-            © 2024 Institute for Global Research. All rights reserved.
+            © 2025 Youth Tech and Ethics. All rights reserved.
           </div>
         </div>
       </footer>
