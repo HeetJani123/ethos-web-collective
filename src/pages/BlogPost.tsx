@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
-  Heart, 
+  // Heart, 
   MessageCircle, 
   Share2, 
   Calendar, 
@@ -272,7 +272,8 @@ const BlogPost = () => {
                     onClick={handleLike}
                     className="space-x-2"
                   >
-                    <Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} />
+                    {/* Heart icon removed */}
+                  <span>{likes}</span>
                     <span>{likes}</span>
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleShare}>

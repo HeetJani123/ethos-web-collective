@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
-import { Users, Globe, FileText, TrendingUp, Zap, Shield, Heart } from 'lucide-react';
+import { Users, Globe, FileText, TrendingUp, Zap, Shield } from 'lucide-react';
 import Tilt from 'react-parallax-tilt';
 import { useRef, useEffect, useState } from 'react';
 
-const teamIcons = [Users, Globe, FileText, TrendingUp, Zap, Shield, Heart];
+const teamIcons = [Users, Globe, FileText, TrendingUp, Zap, Shield];
 
 function useInView(threshold = 0.18) {
   const ref = useRef(null);
